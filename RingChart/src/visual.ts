@@ -494,6 +494,21 @@ export class Sunburst implements IVisual {
         this.toggleLabels(isSelected);
 
         if (!isSelected) {
+            
+            this.data.dataPoints.forEach((dataPoint: SunburstDataPoint) => {
+                if(dataPoint.active) {
+                    let decimalPlaces = this.settings.proportionField.decimalPlaces;
+                    let decimalFormat = `0.${"0".repeat(parseInt(decimalPlaces))}%;-0.${"0".repeat(parseInt(decimalPlaces))}%;0.${"0".repeat(parseInt(decimalPlaces))}%;`;
+                    this.percentageFormatter = valueFormatter.create({ cultureSelector: this.visualHost.locale, format: decimalFormat });
+                    const percentage: string = this.getFormattedValue(dataPoint.total / this.data.total, this.percentageFormatter).replace(/\./g, ',');
+                    this.percentageLabel.data([percentage]);
+                    this.percentageLabel.style("fill", dataPoint.color);
+                    this.selectedCategoryLabel.data([dataPoint ? dataPoint.tooltipInfo[0].displayName : ""]);
+                    this.selectedCategoryLabel.style("fill", dataPoint.color);
+                    this.calculateLabelPosition();
+                    this.toggleLabels(true);
+                }
+            });
             return;
         }
 
