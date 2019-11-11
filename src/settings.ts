@@ -27,10 +27,13 @@
 import { dataViewObjectsParser } from "powerbi-visuals-utils-dataviewutils";
 import DataViewObjectsParser = dataViewObjectsParser.DataViewObjectsParser;
 
-class SunburstGroupSettings {
-    public fontSize: number = 14;
+class SunburstProportionFieldSettings {
+    public fontSize: number = 20;
     public showSelected: boolean = true;
     public showDataLabels: boolean = true;
+}
+
+class SunburstGroupSettings {
 }
 
 class SunburstTooltipSettings {
@@ -49,6 +52,7 @@ class LegendSettings {
 
 export class SunburstSettings extends DataViewObjectsParser {
     public group: SunburstGroupSettings = new SunburstGroupSettings();
+    public proportionField: SunburstProportionFieldSettings = new SunburstProportionFieldSettings();
     public legend: LegendSettings = new LegendSettings();
     public tooltip: SunburstTooltipSettings = new SunburstTooltipSettings();
 }

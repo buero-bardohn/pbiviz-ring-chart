@@ -113,9 +113,9 @@ interface IAppCssConstants {
 export class Sunburst implements IVisual {
     private static ViewBoxSize: number = 500;
     private static CentralPoint: number = Sunburst.ViewBoxSize / 2;
-    private static OuterRadius: number = Sunburst.ViewBoxSize / 2;
-    private static PercentageFontSizeMultiplier: number = 2;
-    private static CategoryLineInterval: number = 0.6;
+    private static OuterRadius: number = Sunburst.ViewBoxSize / 2.5;
+    private static PercentageFontSizeMultiplier: number = 1.5;
+    private static CategoryLineInterval: number = 1.5;
     private static DefaultPercentageLineInterval: number = 0.25;
     private static MultilinePercentageLineInterval: number = 0.6;
 
@@ -126,6 +126,11 @@ export class Sunburst implements IVisual {
         propertyName: "fill"
     };
 
+    private static SelectedDataPropertyIdentifier: DataViewObjectPropertyIdentifier = {
+        objectName: "proportionField",
+        propertyName: "selectedData"
+    };
+
     private toggleLabels(isShown: boolean = true) {
         this.percentageLabel.classed(
             this.appCssConstants.labelVisible.className,
@@ -134,7 +139,7 @@ export class Sunburst implements IVisual {
 
         this.selectedCategoryLabel.classed(
             this.appCssConstants.labelVisible.className,
-            isShown && this.settings.group.showSelected
+            isShown && this.settings.proportionField.showSelected
         );
     }
 
@@ -265,7 +270,7 @@ export class Sunburst implements IVisual {
             this.viewport = options.viewport;
 
             this.settings = this.parseSettings(options.dataViews[0]);
-
+            
             const formatter: IValueFormatter = valueFormatter.create({
                 value: this.settings.tooltip.displayUnits,
                 precision: this.settings.tooltip.precision,
@@ -310,6 +315,17 @@ export class Sunburst implements IVisual {
 
                 this.behavior.renderSelection(false);
             }
+            this.data.dataPoints.forEach((dataPoint: SunburstDataPoint) => {
+                if(dataPoint.active) {
+                    const percentage: string = this.getFormattedValue(dataPoint.total / this.data.total, this.percentageFormatter);
+                    this.percentageLabel.data([percentage]);
+                    this.percentageLabel.style("fill", dataPoint.color);
+                    this.selectedCategoryLabel.data([dataPoint ? dataPoint.tooltipInfo[0].displayName : ""]);
+                    this.selectedCategoryLabel.style("fill", dataPoint.color);
+                    this.calculateLabelPosition();
+                    this.toggleLabels(true);
+                }
+            });
 
             this.events && this.events.renderingFinished(options);
         }
@@ -328,6 +344,23 @@ export class Sunburst implements IVisual {
         if (options.objectName === Sunburst.LegendPropertyIdentifier.objectName) {
             const topCategories: SunburstDataPoint[] = this.data.root.children;
             this.enumerateColors(topCategories, instanceEnumeration);
+        }
+        
+        if (options.objectName === Sunburst.SelectedDataPropertyIdentifier.objectName) {
+            const topCategories: SunburstDataPoint[] = this.data.root.children;
+            if (topCategories && topCategories.length > 0) {
+                topCategories.forEach((category: SunburstDataPoint) => {
+                    const identity: ISelectionId = category.identity as ISelectionId;
+                    this.addAnInstanceToEnumeration(instanceEnumeration, {
+                        displayName: "Select " + category.name.toString(),
+                        objectName: Sunburst.SelectedDataPropertyIdentifier.objectName.toString(),
+                        selector: identity.getSelector(),
+                        properties: {
+                            selectedData: category.active
+                        }
+                    });
+                });
+            }
         }
 
         return (instanceEnumeration as VisualObjectInstanceEnumerationObject).instances || [];
@@ -390,7 +423,7 @@ export class Sunburst implements IVisual {
                 .style("stroke-width", () => colorHelper.isHighContrast ? PixelConverter.toString(2) : null)
                 .attr("d", this.arc);
 
-        if (this.settings.group.showDataLabels) {
+        if (this.settings.proportionField.showDataLabels) {
             const self = this;
 
             pathSelectionMerged.each(function (d: HierarchyRectangularNode<SunburstDataPoint>, i: number) {
@@ -558,10 +591,16 @@ export class Sunburst implements IVisual {
             ? `${originParentNodeValue}`
             : "";
 
+        let activeValue: boolean = false;
+        if(typeof(originParentNode.objects) != 'undefined') {
+            activeValue = !!originParentNode.objects.proportionField.selectedData;
+        }
+        
         const newDataPointNode: SunburstDataPoint = {
             name,
             identity,
             selected: false,
+            active: activeValue,
             value: Math.max(valueToSet, 0),
             key: identity
                 ? identity.getKey()
@@ -575,22 +614,17 @@ export class Sunburst implements IVisual {
         data.total += newDataPointNode.value;
         newDataPointNode.children = [];
 
-        if (name && level === 2 && !originParentNode.objects) {
-            const initialColor: string = colorPalette.getColor(name).value;
-            const parsedColor: string = this.getColor(
-                Sunburst.LegendPropertyIdentifier,
-                initialColor,
-                originParentNode.objects,
-                name
-            );
-
-            newDataPointNode.color = colorHelper.getHighContrastColor(
-                "foreground",
-                parsedColor,
-            );
-        } else {
-            newDataPointNode.color = parentColor;
-        }
+        const initialColor: string = colorPalette.getColor(name).value;
+        const parsedColor: string = this.getColor(
+            Sunburst.LegendPropertyIdentifier,
+            initialColor,
+            originParentNode.objects,
+            name
+        );
+        newDataPointNode.color = colorHelper.getHighContrastColor(
+            "foreground",
+            parsedColor,
+        );
 
         if (originParentNode.children && originParentNode.children.length > 0) {
             for (const child of originParentNode.children) {
@@ -707,13 +741,13 @@ export class Sunburst implements IVisual {
 
     private setCategoryLabelPosition(width: number): void {
         const self = this;
-        if (this.settings.group.showSelected) {
+        if (this.settings.proportionField.showSelected) {
             if (this.selectedCategoryLabel) {
-                const labelSize: number = this.settings.group.fontSize;
+                const labelSize: number = this.settings.proportionField.fontSize;
                 this.selectedCategoryLabel
                     .attr(CssConstants.transformProperty, translate(0, labelSize * -Sunburst.CategoryLineInterval))
                     .style("font-size", PixelConverter.toString(labelSize))
-                    .text((x: string) => x).each(function (d: string) { self.wrapText(d3Select(this), Sunburst.DefaultDataLabelPadding, width); });
+                    .text((x: string) => x);
             }
         }
         else {
@@ -723,15 +757,15 @@ export class Sunburst implements IVisual {
 
     private setPercentageLabelPosition(width: number): void {
         const self = this;
-        const labelSize: number = this.settings.group.fontSize * Sunburst.PercentageFontSizeMultiplier;
+        const labelSize: number = this.settings.proportionField.fontSize * Sunburst.PercentageFontSizeMultiplier;
         const labelTransform: number = labelSize *
-            (this.settings.group.showSelected ?
+            (this.settings.proportionField.showSelected ?
                 Sunburst.MultilinePercentageLineInterval :
                 Sunburst.DefaultPercentageLineInterval);
         this.percentageLabel
             .attr(CssConstants.transformProperty, translate(0, labelTransform))
             .style("font-size", PixelConverter.toString(labelSize))
-            .text((x: string) => x).each(function (d: string) { self.wrapText(d3Select(this), Sunburst.DefaultDataLabelPadding, width); });
+            .text((x: string) => x);
     }
 
     private renderTooltip(selection: Selection<d3.BaseType, any, d3.BaseType, any>): void {

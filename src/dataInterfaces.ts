@@ -41,6 +41,7 @@ export interface SunburstDataPoint extends
     children?: SunburstDataPoint[];
     value?: number;
     color?: string;
+    active?: boolean;
     name?: string;
     parent?: SunburstDataPoint;
     total: number;

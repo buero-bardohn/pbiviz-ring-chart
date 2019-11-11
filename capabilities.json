@@ -18,7 +18,7 @@
       "conditions": [
         {
           "Groups": {
-            "min": 0
+            "max": 1
           },
           "Values": {
             "max": 1
@@ -44,6 +44,30 @@
       "displayName": "Group",
       "displayNameKey": "Visual_Group",
       "properties": {
+        "fill": {
+          "displayName": "Top category color",
+          "displayNameKey": "Visual_TopCategoryColor",
+          "type": {
+            "fill": {
+              "solid": {
+                "color": true
+              }
+            }
+          }
+        },
+        "selectedData": {
+          "displayName": "Selected Data",
+          "displayNameKey": "Visual_SelectedData",
+          "type": {
+            "bool": true
+          }
+        }
+      }
+    },
+    "proportionField": {
+      "displayName": "Proportion field",
+      "displayNameKey": "Visual_ProportionField",
+      "properties": {
         "showSelected": {
           "displayName": "Show category label",
           "displayNameKey": "Visual_ShowCategoryLabel",
@@ -67,15 +91,11 @@
             }
           }
         },
-        "fill": {
-          "displayName": "Top category color",
-          "displayNameKey": "Visual_TopCategoryColor",
+        "selectedData": {
+          "displayName": "Selected Data",
+          "displayNameKey": "Visual_SelectedData",
           "type": {
-            "fill": {
-              "solid": {
-                "color": true
-              }
-            }
+            "bool": true
           }
         }
       }
@@ -207,14 +227,14 @@
       }
     }
   },
-   "sorting": {
-        "implicit": {
-            "clauses": [
-                {
-                    "role": "Values",
-                    "direction": 1
-                }
-            ]
+  "sorting": {
+    "implicit": {
+      "clauses": [
+        {
+          "role": "Values",
+          "direction": 1
         }
+      ]
     }
+  }
 }
