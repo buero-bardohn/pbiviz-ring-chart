@@ -31,6 +31,7 @@ class SunburstProportionFieldSettings {
     public fontSize: number = 20;
     public showSelected: boolean = true;
     public showDataLabels: boolean = true;
+    public decimalPlaces: string = "2";
 }
 
 class SunburstGroupSettings {

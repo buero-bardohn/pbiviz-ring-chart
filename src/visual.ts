@@ -190,7 +190,7 @@ export class Sunburst implements IVisual {
             options.element
         );
 
-        this.percentageFormatter = valueFormatter.create({ format: "0.00%;-0.00%;0.00%" });
+        this.percentageFormatter = valueFormatter.create({ cultureSelector: "de", format: "0.00%;-0.00%;0.00%" });
 
         this.colorPalette = this.visualHost.colorPalette;
         this.colorHelper = new ColorHelper(this.colorPalette);
@@ -317,7 +317,10 @@ export class Sunburst implements IVisual {
             }
             this.data.dataPoints.forEach((dataPoint: SunburstDataPoint) => {
                 if(dataPoint.active) {
-                    const percentage: string = this.getFormattedValue(dataPoint.total / this.data.total, this.percentageFormatter);
+                    let decimalPlaces = this.settings.proportionField.decimalPlaces;
+                    let decimalFormat = `0.${"0".repeat(parseInt(decimalPlaces))}%;-0.${"0".repeat(parseInt(decimalPlaces))}%;0.${"0".repeat(parseInt(decimalPlaces))}%;`;
+                    this.percentageFormatter = valueFormatter.create({ cultureSelector: this.visualHost.locale, format: decimalFormat });
+                    const percentage: string = this.getFormattedValue(dataPoint.total / this.data.total, this.percentageFormatter).replace(/\./g, ',');
                     this.percentageLabel.data([percentage]);
                     this.percentageLabel.style("fill", dataPoint.color);
                     this.selectedCategoryLabel.data([dataPoint ? dataPoint.tooltipInfo[0].displayName : ""]);
@@ -494,7 +497,7 @@ export class Sunburst implements IVisual {
             return;
         }
 
-        const percentage: string = this.getFormattedValue(dataPoint.total / this.data.total, this.percentageFormatter);
+        const percentage: string = this.getFormattedValue(dataPoint.total / this.data.total, this.percentageFormatter).replace(/\./g, ',');
         this.percentageLabel.data([percentage]);
         this.percentageLabel.style("fill", dataPoint.color);
         this.selectedCategoryLabel.data([dataPoint ? dataPoint.tooltipInfo[0].displayName : ""]);
