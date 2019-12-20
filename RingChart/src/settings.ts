@@ -28,7 +28,9 @@ import { dataViewObjectsParser } from "powerbi-visuals-utils-dataviewutils";
 import DataViewObjectsParser = dataViewObjectsParser.DataViewObjectsParser;
 
 class SunburstProportionFieldSettings {
-    public fontSize: number = 20;
+    public fontSizePercentage: number = 20;
+    public fontSizeCategory: number = 20;
+    public positionCategory: number = 10;
     public showSelected: boolean = true;
     public showDataLabels: boolean = true;
     public decimalPlaces: string = "2";

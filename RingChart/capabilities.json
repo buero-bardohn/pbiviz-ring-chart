@@ -82,13 +82,29 @@
             "bool": true
           }
         },
-        "fontSize": {
-          "displayName": "Font size",
-          "displayNameKey": "Visual_FontSize",
+        "fontSizePercentage": {
+          "displayName": "Font size Percentage",
+          "displayNameKey": "Visual_FontSize_Percentage",
           "type": {
             "formatting": {
               "fontSize": true
             }
+          }
+        },
+        "fontSizeCategory": {
+          "displayName": "Font size Category",
+          "displayNameKey": "Visual_FontSize_Category",
+          "type": {
+            "formatting": {
+              "fontSize": true
+            }
+          }
+        },
+        "positionCategory": {
+          "displayName": "Y-Position Category",
+          "displayNameKey": "Visual_Position_Category",
+          "type": {
+            "numeric": true
           }
         },
         "decimalPlaces": {

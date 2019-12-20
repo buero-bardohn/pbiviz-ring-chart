@@ -610,7 +610,7 @@ export class Sunburst implements IVisual {
             : "";
 
         let activeValue: boolean = false;
-        if(typeof(originParentNode.objects) != 'undefined') {
+        if(typeof(originParentNode.objects) != 'undefined' && typeof(originParentNode.objects.proportionField) != 'undefined') {
             activeValue = !!originParentNode.objects.proportionField.selectedData;
         }
         
@@ -761,9 +761,10 @@ export class Sunburst implements IVisual {
         const self = this;
         if (this.settings.proportionField.showSelected) {
             if (this.selectedCategoryLabel) {
-                const labelSize: number = this.settings.proportionField.fontSize;
+                const labelSize: number = this.settings.proportionField.fontSizeCategory;
+        
                 this.selectedCategoryLabel
-                    .attr(CssConstants.transformProperty, translate(0, labelSize * -Sunburst.CategoryLineInterval))
+                    .attr(CssConstants.transformProperty, translate(0, (+labelSize + (this.settings.proportionField.fontSizePercentage/2) + this.settings.proportionField.positionCategory)))
                     .style("font-size", PixelConverter.toString(labelSize))
                     .text((x: string) => x);
             }
@@ -775,13 +776,13 @@ export class Sunburst implements IVisual {
 
     private setPercentageLabelPosition(width: number): void {
         const self = this;
-        const labelSize: number = this.settings.proportionField.fontSize * Sunburst.PercentageFontSizeMultiplier;
+        const labelSize: number = this.settings.proportionField.fontSizePercentage * Sunburst.PercentageFontSizeMultiplier;
         const labelTransform: number = labelSize *
             (this.settings.proportionField.showSelected ?
                 Sunburst.MultilinePercentageLineInterval :
                 Sunburst.DefaultPercentageLineInterval);
         this.percentageLabel
-            .attr(CssConstants.transformProperty, translate(0, labelTransform))
+            .attr(CssConstants.transformProperty, translate(0, (this.settings.proportionField.fontSizePercentage/2)))
             .style("font-size", PixelConverter.toString(labelSize))
             .text((x: string) => x);
     }
