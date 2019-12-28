@@ -119,7 +119,7 @@ export class Sunburst implements IVisual {
     private static DefaultPercentageLineInterval: number = 0.25;
     private static MultilinePercentageLineInterval: number = 0.6;
 
-    private static DefaultDataLabelPadding: number = 15;
+    private static DefaultDataLabelPadding: number = -20;
 
     private static LegendPropertyIdentifier: DataViewObjectPropertyIdentifier = {
         objectName: "group",
@@ -473,8 +473,8 @@ export class Sunburst implements IVisual {
 
     private partition(data: SunburstDataPoint) {
         const root = d3Hierarchy<SunburstDataPoint>(data)
-            .sum(d => d.value)
-            .sort((a, b) => b.value - a.value);
+            .sum(d => d.value);
+            //.sort((a, b) => b.value - a.value);
         return d3Partition<SunburstDataPoint>()
             .size([2 * Math.PI, Sunburst.OuterRadius * Sunburst.OuterRadius])(root)
             .each(d => {
@@ -766,7 +766,7 @@ export class Sunburst implements IVisual {
                 this.selectedCategoryLabel
                     .attr(CssConstants.transformProperty, translate(0, (+labelSize + (this.settings.proportionField.fontSizePercentage/2) + this.settings.proportionField.positionCategory)))
                     .style("font-size", PixelConverter.toString(labelSize))
-                    .text((x: string) => x);
+                    .text((x: string) => x).each(function (d: string) { self.wrapLabel(d3Select(this), Sunburst.DefaultDataLabelPadding, width); });
             }
         }
         else {
@@ -851,6 +851,88 @@ export class Sunburst implements IVisual {
         if (textLength > (width - 2 * padding)) {
             selection.text("");
         }
+    }
+
+    private wrapLabel(selection: Selection<d3.BaseType, any, d3.BaseType, any>, padding?: number, width?: number): void {
+
+        let node: SVGTextElement = <SVGTextElement>selection.node(),
+            labelLength: number = node.getComputedTextLength(),
+            label: string = selection.text();
+        width = width || 0;
+        padding = padding || 0;
+        selection.text("");
+
+        const words = label.split(" ");
+        const completedLines = [];
+        let nextLine = "";
+        let maxWidth = (width - 2 * padding);
+        
+        words.forEach((word, index) => {
+            const wordLength = this.getTextWidth(`${word} `, `500 ${selection.style("font-size")} sans-serif`);
+            const nextLineLength = this.getTextWidth(nextLine, `500 ${selection.style("font-size")} sans-serif`);
+            console.log(wordLength)
+            console.log(maxWidth)
+
+            if (wordLength > maxWidth) {
+                const { hyphenatedStrings, remainingWord } = this.breakString(selection, word, maxWidth);
+                completedLines.push(nextLine, ...hyphenatedStrings);
+                nextLine = remainingWord;
+            } else if (nextLineLength + wordLength >= maxWidth) {
+                completedLines.push(nextLine);
+                nextLine = word;
+            } else {
+                nextLine = [nextLine, word].filter(Boolean).join(" ");
+            }
+            const currentWord = index + 1;
+            const isLastWord = currentWord === words.length;
+            if (isLastWord) {
+                completedLines.push(nextLine);
+            }
+        });
+        let labelText = completedLines.filter(line => line !== "");
+        const wrappedText = labelText.map((word, index) => (
+            `<tspan x=${0} dy=${index === 0 ? 0 : 14}>
+              ${word}
+            </tspan>`
+          ));
+          
+          labelText.forEach((tspanText, index) => {
+            selection.append('tspan')
+                .text(tspanText)
+                .attr("x", selection.attr("x"))
+                .attr("y", index === 0 ? selection.attr("y") : (+selection.attr("y") + index * parseInt(selection.style("font-size"), 10)));
+          });
+
+
+          //selection.text(result);
+          //console.log(label.)
+    }
+
+    private breakString(selection, word, maxWidth, hyphenCharacter='-') {
+        const characters = word.split("");
+        const lines = [];
+        let currentLine = "";
+        characters.forEach((character, index) => {
+          const nextLine = `${currentLine}${character}`;
+          const lineWidth = this.getTextWidth(nextLine, `500 ${selection.style("font-size")} sans-serif`);
+          if (lineWidth >= maxWidth) {
+            const currentCharacter = index + 1;
+            const isLastLine = characters.length === currentCharacter;
+            const hyphenatedNextLine = `${nextLine}${hyphenCharacter}`;
+            lines.push(isLastLine ? nextLine : hyphenatedNextLine);
+            currentLine = "";
+          } else {
+            currentLine = nextLine;
+          }
+        });
+        return { hyphenatedStrings: lines, remainingWord: currentLine };
+      }
+
+    private getTextWidth(text, font = "500 12px sans-serif") {
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+        context.font = font;
+        return context.measureText(text).width;
     }
 
     private clear(): void {
