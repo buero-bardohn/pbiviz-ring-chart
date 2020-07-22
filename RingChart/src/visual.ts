@@ -27,7 +27,7 @@
 "use strict";
 
 import "@babel/polyfill";
-import "../style/sunburst.less";
+import "../style/ring_chart.less";
 import { Selection, select as d3Select } from "d3-selection";
 import { Arc, arc as d3Arc } from "d3-shape";
 import { partition as d3Partition, hierarchy as d3Hierarchy, HierarchyRectangularNode } from "d3-hierarchy";
@@ -94,8 +94,8 @@ import { interactivityBaseService } from "powerbi-visuals-utils-interactivityuti
 import IInteractiveBehavior = interactivityBaseService.IInteractiveBehavior;
 
 import { Behavior, BehaviorOptions, InteractivityService } from "./behavior";
-import { SunburstData, SunburstDataPoint } from "./dataInterfaces";
-import { SunburstSettings } from "./settings";
+import { RingChartData, RingChartDataPoint } from "./dataInterfaces";
+import { RingChartSettings } from "./settings";
 
 interface IAppCssConstants {
     main: ClassAndSelector;
@@ -110,10 +110,10 @@ interface IAppCssConstants {
     sliceLabel: ClassAndSelector;
 }
 
-export class Sunburst implements IVisual {
+export class RingChart implements IVisual {
     private static ViewBoxSize: number = 500;
-    private static CentralPoint: number = Sunburst.ViewBoxSize / 2;
-    private static OuterRadius: number = Sunburst.ViewBoxSize / 2.5;
+    private static CentralPoint: number = RingChart.ViewBoxSize / 2;
+    private static OuterRadius: number = RingChart.ViewBoxSize / 2.5;
     private static PercentageFontSizeMultiplier: number = 1.5;
     private static CategoryLineInterval: number = 1.5;
     private static DefaultPercentageLineInterval: number = 0.25;
@@ -143,11 +143,11 @@ export class Sunburst implements IVisual {
         );
     }
 
-    private settings: SunburstSettings;
+    private settings: RingChartSettings;
 
     private visualHost: IVisualHost;
     private events: IVisualEventService;
-    private data: SunburstData;
+    private data: RingChartData;
     private arc: Arc<any, any>;
     private chartWrapper: Selection<d3.BaseType, any, d3.BaseType, any>;
     private svg: Selection<d3.BaseType, string, d3.BaseType, string>;
@@ -157,16 +157,16 @@ export class Sunburst implements IVisual {
     private selectedCategoryLabel: Selection<d3.BaseType, string, d3.BaseType, string>;
 
     private appCssConstants: IAppCssConstants = {
-        main: createClassAndSelector("sunburst"),
-        mainInteractive: createClassAndSelector("sunburst--interactive"),
-        slice: createClassAndSelector("sunburst__slice"),
-        sliceSelected: createClassAndSelector("sunburst__slice--selected"),
-        sliceHidden: createClassAndSelector("sunburst__slice--hidden"),
-        label: createClassAndSelector("sunburst__label"),
-        labelVisible: createClassAndSelector("sunburst__label--visible"),
-        categoryLabel: createClassAndSelector("sunburst__category-label"),
-        percentageLabel: createClassAndSelector("sunburst__percentage-label"),
-        sliceLabel: createClassAndSelector("sunburst__slice-label")
+        main: createClassAndSelector("ring_chart"),
+        mainInteractive: createClassAndSelector("ring_chart--interactive"),
+        slice: createClassAndSelector("ring_chart__slice"),
+        sliceSelected: createClassAndSelector("ring_chart__slice--selected"),
+        sliceHidden: createClassAndSelector("ring_chart__slice--hidden"),
+        label: createClassAndSelector("ring_chart__label"),
+        labelVisible: createClassAndSelector("ring_chart__label--visible"),
+        categoryLabel: createClassAndSelector("ring_chart__category-label"),
+        percentageLabel: createClassAndSelector("ring_chart__percentage-label"),
+        sliceLabel: createClassAndSelector("ring_chart__slice-label")
     };
 
     private colorPalette: IColorPalette;
@@ -194,7 +194,7 @@ export class Sunburst implements IVisual {
 
         this.colorPalette = this.visualHost.colorPalette;
         this.colorHelper = new ColorHelper(this.colorPalette);
-        this.arc = d3Arc<HierarchyRectangularNode<SunburstDataPoint>>()
+        this.arc = d3Arc<HierarchyRectangularNode<RingChartDataPoint>>()
                 .startAngle(d => d.x0)
                 .endAngle(d => d.x1)
                 .innerRadius((d) => Math.sqrt(d.y0))
@@ -213,28 +213,28 @@ export class Sunburst implements IVisual {
 
         this.svg = this.chartWrapper
             .append("svg")
-            .attr("viewBox", `0 0 ${Sunburst.ViewBoxSize} ${Sunburst.ViewBoxSize}`)
+            .attr("viewBox", `0 0 ${RingChart.ViewBoxSize} ${RingChart.ViewBoxSize}`)
             .attr("width", "100%")
             .attr("height", "100%")
             .attr("preserveAspectRatio", "xMidYMid meet");
 
         this.main = this.svg.append("g");
-        this.main.attr(CssConstants.transformProperty, translate(Sunburst.CentralPoint, Sunburst.CentralPoint));
+        this.main.attr(CssConstants.transformProperty, translate(RingChart.CentralPoint, RingChart.CentralPoint));
 
         this.selectedCategoryLabel = this.svg
             .append("text")
             .classed(this.appCssConstants.label.className, true)
             .classed(this.appCssConstants.categoryLabel.className, true);
 
-        this.selectedCategoryLabel.attr("x", Sunburst.CentralPoint);
-        this.selectedCategoryLabel.attr("y", Sunburst.CentralPoint);
+        this.selectedCategoryLabel.attr("x", RingChart.CentralPoint);
+        this.selectedCategoryLabel.attr("y", RingChart.CentralPoint);
 
         this.percentageLabel = this.svg
             .append("text")
             .classed(this.appCssConstants.label.className, true)
             .classed(this.appCssConstants.percentageLabel.className, true);
-        this.percentageLabel.attr("x", Sunburst.CentralPoint);
-        this.percentageLabel.attr("y", Sunburst.CentralPoint);
+        this.percentageLabel.attr("x", RingChart.CentralPoint);
+        this.percentageLabel.attr("y", RingChart.CentralPoint);
 
         // create legend container
         this.legend = createLegend(options.element,
@@ -289,7 +289,7 @@ export class Sunburst implements IVisual {
             const selection = this.render(this.colorHelper);
 
             if (this.data) {
-                this.legendData = Sunburst.createLegend(this.data, this.settings);
+                this.legendData = RingChart.createLegend(this.data, this.settings);
 
                 this.renderLegend();
             }
@@ -315,7 +315,7 @@ export class Sunburst implements IVisual {
 
                 this.behavior.renderSelection(false);
             }
-            this.data.dataPoints.forEach((dataPoint: SunburstDataPoint) => {
+            this.data.dataPoints.forEach((dataPoint: RingChartDataPoint) => {
                 if(dataPoint.active) {
                     let decimalPlaces = this.settings.proportionField.decimalPlaces;
                     let decimalFormat = `0.${"0".repeat(parseInt(decimalPlaces))}%;-0.${"0".repeat(parseInt(decimalPlaces))}%;0.${"0".repeat(parseInt(decimalPlaces))}%;`;
@@ -339,24 +339,24 @@ export class Sunburst implements IVisual {
     }
 
     public enumerateObjectInstances(options: EnumerateVisualObjectInstancesOptions): VisualObjectInstanceEnumeration {
-        const instanceEnumeration: VisualObjectInstanceEnumeration = SunburstSettings.enumerateObjectInstances(
-            this.settings || SunburstSettings.getDefault(),
+        const instanceEnumeration: VisualObjectInstanceEnumeration = RingChartSettings.enumerateObjectInstances(
+            this.settings || RingChartSettings.getDefault(),
             options
         );
 
-        if (options.objectName === Sunburst.LegendPropertyIdentifier.objectName) {
-            const topCategories: SunburstDataPoint[] = this.data.root.children;
+        if (options.objectName === RingChart.LegendPropertyIdentifier.objectName) {
+            const topCategories: RingChartDataPoint[] = this.data.root.children;
             this.enumerateColors(topCategories, instanceEnumeration);
         }
         
-        if (options.objectName === Sunburst.SelectedDataPropertyIdentifier.objectName) {
-            const topCategories: SunburstDataPoint[] = this.data.root.children;
+        if (options.objectName === RingChart.SelectedDataPropertyIdentifier.objectName) {
+            const topCategories: RingChartDataPoint[] = this.data.root.children;
             if (topCategories && topCategories.length > 0) {
-                topCategories.forEach((category: SunburstDataPoint) => {
+                topCategories.forEach((category: RingChartDataPoint) => {
                     const identity: ISelectionId = category.identity as ISelectionId;
                     this.addAnInstanceToEnumeration(instanceEnumeration, {
                         displayName: "Select " + category.name.toString(),
-                        objectName: Sunburst.SelectedDataPropertyIdentifier.objectName.toString(),
+                        objectName: RingChart.SelectedDataPropertyIdentifier.objectName.toString(),
                         selector: identity.getSelector(),
                         properties: {
                             selectedData: category.active
@@ -369,15 +369,15 @@ export class Sunburst implements IVisual {
         return (instanceEnumeration as VisualObjectInstanceEnumerationObject).instances || [];
     }
 
-    private enumerateColors(topCategories: SunburstDataPoint[], instanceEnumeration: VisualObjectInstanceEnumeration): void {
+    private enumerateColors(topCategories: RingChartDataPoint[], instanceEnumeration: VisualObjectInstanceEnumeration): void {
         if (topCategories && topCategories.length > 0) {
-            topCategories.forEach((category: SunburstDataPoint) => {
+            topCategories.forEach((category: RingChartDataPoint) => {
                 const displayName: string = category.name.toString();
                 const identity: ISelectionId = category.identity as ISelectionId;
 
                 this.addAnInstanceToEnumeration(instanceEnumeration, {
                     displayName,
-                    objectName: Sunburst.LegendPropertyIdentifier.objectName.toString(),
+                    objectName: RingChart.LegendPropertyIdentifier.objectName.toString(),
                     selector: ColorHelper.normalizeSelector(identity.getSelector(), false),
                     properties: {
                         fill: { solid: { color: category.color } }
@@ -404,9 +404,9 @@ export class Sunburst implements IVisual {
     }
 
     private static labelShift: number = 26;
-    private render(colorHelper: ColorHelper): Selection<d3.BaseType, HierarchyRectangularNode<SunburstDataPoint>, d3.BaseType, SunburstDataPoint> {
+    private render(colorHelper: ColorHelper): Selection<d3.BaseType, HierarchyRectangularNode<RingChartDataPoint>, d3.BaseType, RingChartDataPoint> {
         const root = this.partition(this.data.root).descendants().slice(1);
-        const pathSelection: Selection<d3.BaseType, HierarchyRectangularNode<SunburstDataPoint>, d3.BaseType, SunburstDataPoint> =
+        const pathSelection: Selection<d3.BaseType, HierarchyRectangularNode<RingChartDataPoint>, d3.BaseType, RingChartDataPoint> =
             this.main
                 .selectAll("path");
         const pathSelectionData = pathSelection.data(root);
@@ -415,7 +415,7 @@ export class Sunburst implements IVisual {
             .exit()
             .remove();
 
-        const pathSelectionEnter: Selection<d3.BaseType, HierarchyRectangularNode<SunburstDataPoint>, d3.BaseType, SunburstDataPoint> =
+        const pathSelectionEnter: Selection<d3.BaseType, HierarchyRectangularNode<RingChartDataPoint>, d3.BaseType, RingChartDataPoint> =
         pathSelectionData.enter()
                 .append("path");
         const pathSelectionMerged = pathSelectionEnter.merge(pathSelection);
@@ -429,7 +429,7 @@ export class Sunburst implements IVisual {
         if (this.settings.proportionField.showDataLabels) {
             const self = this;
 
-            pathSelectionMerged.each(function (d: HierarchyRectangularNode<SunburstDataPoint>, i: number) {
+            pathSelectionMerged.each(function (d: HierarchyRectangularNode<RingChartDataPoint>, i: number) {
                 const firstArcSection: RegExp = /(^.+?)L/;
                 const currentSelection = d3Select(this);
                 const arcRegExpArray: RegExpExecArray = firstArcSection.exec(currentSelection.attr("d"));
@@ -456,12 +456,12 @@ export class Sunburst implements IVisual {
                 .style("fill", colorHelper.getHighContrastColor("foreground", null))
                 .classed(this.appCssConstants.sliceLabel.className, true)
                 // font size + slice padding
-                .attr("dy", Sunburst.labelShift)
+                .attr("dy", RingChart.labelShift)
                 .append("textPath")
                 .attr("startOffset", "50%")
                 .attr("xlink:href", (d, i) => "#sliceLabel_" + i)
                 .text(dataPoint => dataPoint.data.name)
-                .each(this.wrapPathText(Sunburst.DefaultDataLabelPadding));
+                .each(this.wrapPathText(RingChart.DefaultDataLabelPadding));
         }
 
         this.renderTooltip(pathSelectionMerged);
@@ -471,12 +471,12 @@ export class Sunburst implements IVisual {
         return pathSelectionMerged;
     }
 
-    private partition(data: SunburstDataPoint) {
-        const root = d3Hierarchy<SunburstDataPoint>(data)
+    private partition(data: RingChartDataPoint) {
+        const root = d3Hierarchy<RingChartDataPoint>(data)
             .sum(d => d.value);
             //.sort((a, b) => b.value - a.value);
-        return d3Partition<SunburstDataPoint>()
-            .size([2 * Math.PI, Sunburst.OuterRadius * Sunburst.OuterRadius])(root)
+        return d3Partition<RingChartDataPoint>()
+            .size([2 * Math.PI, RingChart.OuterRadius * RingChart.OuterRadius])(root)
             .each(d => {
                 d.data.coords = {
                     x0: d.x0,
@@ -488,14 +488,14 @@ export class Sunburst implements IVisual {
             });
       }
 
-    private onVisualSelection(dataPoint: SunburstDataPoint): void {
+    private onVisualSelection(dataPoint: RingChartDataPoint): void {
         const isSelected: boolean = !!(dataPoint && dataPoint.selected);
 
         this.toggleLabels(isSelected);
 
         if (!isSelected) {
             
-            this.data.dataPoints.forEach((dataPoint: SunburstDataPoint) => {
+            this.data.dataPoints.forEach((dataPoint: RingChartDataPoint) => {
                 if(dataPoint.active) {
                     let decimalPlaces = this.settings.proportionField.decimalPlaces;
                     let decimalFormat = `0.${"0".repeat(parseInt(decimalPlaces))}%;-0.${"0".repeat(parseInt(decimalPlaces))}%;0.${"0".repeat(parseInt(decimalPlaces))}%;`;
@@ -526,8 +526,8 @@ export class Sunburst implements IVisual {
         colorHelper: ColorHelper,
         visualHost: IVisualHost,
         formatter: IValueFormatter
-    ): SunburstData {
-        const data: SunburstData = {
+    ): RingChartData {
+        const data: RingChartData = {
             total: 0,
             root: null,
             dataPoints: [],
@@ -539,7 +539,7 @@ export class Sunburst implements IVisual {
         dataView.matrix.rows.levels.forEach(level => {
             level.sources[0].queryName += Math.random();
         });
-        data.root = this.covertTreeNodeToSunBurstDataPoint(
+        data.root = this.covertTreeNodeToRingChartDataPoint(
             dataView.matrix.rows.root,
             null,
             colorPalette,
@@ -558,20 +558,20 @@ export class Sunburst implements IVisual {
 
     private maxLevels: number = 0;
 
-    public covertTreeNodeToSunBurstDataPoint(
+    public covertTreeNodeToRingChartDataPoint(
         originParentNode: DataViewTreeNode,
-        sunburstParentNode: SunburstDataPoint,
+        ringChartParentNode: RingChartDataPoint,
         colorPalette: IColorPalette,
         colorHelper: ColorHelper,
         pathIdentity: DataSelector[],
-        data: SunburstData,
+        data: RingChartData,
         parentColor: string,
         visualHost: IVisualHost,
         level: number,
         formatter: IValueFormatter,
         levels: DataViewHierarchyLevel[],
         parentNodes: DataViewTreeNode[] = [],
-    ): SunburstDataPoint {
+    ): RingChartDataPoint {
         if (originParentNode.identity) {
             pathIdentity = pathIdentity.concat([originParentNode.identity]);
         }
@@ -614,7 +614,7 @@ export class Sunburst implements IVisual {
             activeValue = !!originParentNode.objects.proportionField.selectedData;
         }
         
-        const newDataPointNode: SunburstDataPoint = {
+        const newDataPointNode: RingChartDataPoint = {
             name,
             identity,
             selected: false,
@@ -634,7 +634,7 @@ export class Sunburst implements IVisual {
 
         const initialColor: string = colorPalette.getColor(name).value;
         const parsedColor: string = this.getColor(
-            Sunburst.LegendPropertyIdentifier,
+            RingChart.LegendPropertyIdentifier,
             initialColor,
             originParentNode.objects,
             name
@@ -647,13 +647,13 @@ export class Sunburst implements IVisual {
         if (originParentNode.children && originParentNode.children.length > 0) {
             for (const child of originParentNode.children) {
                 const nodeColor: string = this.getColor(
-                    Sunburst.LegendPropertyIdentifier,
+                    RingChart.LegendPropertyIdentifier,
                     newDataPointNode.color,
                     child.objects,
                     name
                 );
 
-                const newChild: SunburstDataPoint = this.covertTreeNodeToSunBurstDataPoint(
+                const newChild: RingChartDataPoint = this.covertTreeNodeToRingChartDataPoint(
                     child,
                     newDataPointNode,
                     colorPalette,
@@ -679,8 +679,8 @@ export class Sunburst implements IVisual {
             newDataPointNode.total
         );
 
-        if (sunburstParentNode) {
-            newDataPointNode.parent = sunburstParentNode;
+        if (ringChartParentNode) {
+            newDataPointNode.parent = ringChartParentNode;
         }
 
         return newDataPointNode;
@@ -719,16 +719,16 @@ export class Sunburst implements IVisual {
             : formatter.format(value);
     }
 
-    private parseSettings(dataView: DataView): SunburstSettings {
-        const settings: SunburstSettings = SunburstSettings.parse<SunburstSettings>(dataView);
+    private parseSettings(dataView: DataView): RingChartSettings {
+        const settings: RingChartSettings = RingChartSettings.parse<RingChartSettings>(dataView);
 
         settings.legend.labelColor = this.colorHelper.getHighContrastColor("foreground", settings.legend.labelColor);
 
         return settings;
     }
 
-    private static createLegend(data: SunburstData, settings: SunburstSettings): LegendData {
-        const rootCategory: SunburstDataPoint[] = data.root.children;
+    private static createLegend(data: RingChartData, settings: RingChartSettings): LegendData {
+        const rootCategory: RingChartDataPoint[] = data.root.children;
 
         const legendData: LegendData = {
             fontSize: settings.legend.fontSize,
@@ -737,7 +737,7 @@ export class Sunburst implements IVisual {
             labelColor: settings.legend.labelColor
         };
 
-        legendData.dataPoints = rootCategory.map((dataPoint: SunburstDataPoint) => {
+        legendData.dataPoints = rootCategory.map((dataPoint: RingChartDataPoint) => {
             return {
                 label: dataPoint.name as string,
                 color: dataPoint.color,
@@ -751,7 +751,7 @@ export class Sunburst implements IVisual {
 
     private calculateLabelPosition(): void {
         const innerRadius: number = Math.min(
-            ...this.data.root.children.map((x: SunburstDataPoint) => Math.sqrt(x.coords.y0))
+            ...this.data.root.children.map((x: RingChartDataPoint) => Math.sqrt(x.coords.y0))
         );
         this.setPercentageLabelPosition(innerRadius);
         this.setCategoryLabelPosition(innerRadius);
@@ -766,7 +766,7 @@ export class Sunburst implements IVisual {
                 this.selectedCategoryLabel
                     .attr(CssConstants.transformProperty, translate(0, (+labelSize + (this.settings.proportionField.fontSizePercentage/2) + this.settings.proportionField.positionCategory)))
                     .style("font-size", PixelConverter.toString(labelSize))
-                    .text((x: string) => x).each(function (d: string) { self.wrapLabel(d3Select(this), Sunburst.DefaultDataLabelPadding, width); });
+                    .text((x: string) => x).each(function (d: string) { self.wrapLabel(d3Select(this), RingChart.DefaultDataLabelPadding, width); });
             }
         }
         else {
@@ -776,11 +776,11 @@ export class Sunburst implements IVisual {
 
     private setPercentageLabelPosition(width: number): void {
         const self = this;
-        const labelSize: number = this.settings.proportionField.fontSizePercentage * Sunburst.PercentageFontSizeMultiplier;
+        const labelSize: number = this.settings.proportionField.fontSizePercentage * RingChart.PercentageFontSizeMultiplier;
         const labelTransform: number = labelSize *
             (this.settings.proportionField.showSelected ?
-                Sunburst.MultilinePercentageLineInterval :
-                Sunburst.DefaultPercentageLineInterval);
+                RingChart.MultilinePercentageLineInterval :
+                RingChart.DefaultPercentageLineInterval);
         this.percentageLabel
             .attr(CssConstants.transformProperty, translate(0, (this.settings.proportionField.fontSizePercentage/2)))
             .style("font-size", PixelConverter.toString(labelSize))
@@ -794,7 +794,7 @@ export class Sunburst implements IVisual {
 
         this.tooltipService.addTooltip(
             selection,
-            (tooltipEvent: TooltipEventArgs<HierarchyRectangularNode<SunburstDataPoint>>) => tooltipEvent.data.data.tooltipInfo
+            (tooltipEvent: TooltipEventArgs<HierarchyRectangularNode<RingChartDataPoint>>) => tooltipEvent.data.data.tooltipInfo
         );
     }
 
@@ -828,7 +828,7 @@ export class Sunburst implements IVisual {
         }
     }
 
-    private wrapPathText(padding?: number): (slice: HierarchyRectangularNode<SunburstDataPoint>, index: number) => void {
+    private wrapPathText(padding?: number): (slice: HierarchyRectangularNode<RingChartDataPoint>, index: number) => void {
         const self = this;
         return function () {
             const selection: Selection<d3.BaseType, any, d3.BaseType, any> = d3Select(this);

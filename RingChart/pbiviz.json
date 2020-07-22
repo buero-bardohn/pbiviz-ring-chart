@@ -1,11 +1,11 @@
 {
   "visual": {
-    "name": "Sunburst",
-    "displayName": "Sunburst",
-    "guid": "Sunburst1445472000809",
-    "visualClassName": "Sunburst",
+    "name": "RingChart",
+    "displayName": "RingChart",
+    "guid": "RingChart1445472000809",
+    "visualClassName": "RingChart",
     "version": "2.0.1",
-    "description": "Sunburst is a multilevel donut chart, used to visualize hierarchical data, depicted by concentric circles.",
+    "description": "RingChart is a multilevel donut chart, used to visualize hierarchical data, depicted by concentric circles.",
     "supportUrl": "https://community.powerbi.com"
   },
   "apiVersion": "2.5.0",

@@ -30,14 +30,14 @@ import VisualUpdateType = powerbi.VisualUpdateType;
 import ISelectionId = powerbi.visuals.ISelectionId;
 
 import { VisualBuilderBase, renderTimeout } from "powerbi-visuals-utils-testutils";
-import { Sunburst as VisualClass } from "../src/visual";
+import { RingChart as VisualClass } from "../src/visual";
 import { VisualData } from "./visualData";
 import VisualConstructorOptions = powerbi.extensibility.visual.VisualConstructorOptions;
 
 export class VisualBuilder extends VisualBuilderBase<VisualClass> {
     bookmarksCallback: (ids: ISelectionId[]) => void;
     constructor(width: number, height: number) {
-        super(width, height, "Sunburst1445472000808");
+        super(width, height, "RingChart1445472000808");
     }
 
     public update(dataView: DataView[] | DataView, updateType?: VisualUpdateType): void {
@@ -74,7 +74,7 @@ export class VisualBuilder extends VisualBuilderBase<VisualClass> {
     }
 
     public get mainElement(): JQuery {
-        return this.element.find(".sunburst svg");
+        return this.element.find(".ring_chart svg");
     }
 
     public selectBookmarks(ids: ISelectionId[]) {
@@ -86,7 +86,7 @@ export class VisualBuilder extends VisualBuilderBase<VisualClass> {
     }
 
     public get slices(): JQuery {
-        return this.element.find(".sunburst__slice");
+        return this.element.find(".ring_chart__slice");
     }
 
     public get selectedSlices(): JQuery {

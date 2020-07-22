@@ -33,15 +33,15 @@ import { assertColorsMatch, d3Click} from "powerbi-visuals-utils-testutils";
 import valueFormatter = vf.valueFormatter;
 import { VisualData } from "./visualData";
 import { VisualBuilder } from "./visualBuilder";
-import { SunburstDataPoint } from "../src/dataInterfaces";
+import { RingChartDataPoint } from "../src/dataInterfaces";
 
 const DefaultWaitForRender: number = 500;
 const LegendSelector: string = "#legendGroup";
-const SliceLabelSelector: string = ".sunburst__slice-label";
-const LabelVisibleSelector: string = ".sunburst__label--visible";
-const PercentageSelector: string = ".sunburst__percentage-label";
+const SliceLabelSelector: string = ".ring_chart__slice-label";
+const LabelVisibleSelector: string = ".ring_chart__label--visible";
+const PercentageSelector: string = ".ring_chart__percentage-label";
 
-describe("Sunburst", () => {
+describe("RingChart", () => {
     let visualBuilder: VisualBuilder;
     let defaultDataViewBuilder: VisualData;
     let dataView: DataView;
@@ -51,7 +51,7 @@ describe("Sunburst", () => {
         defaultDataViewBuilder = new VisualData();
     });
 
-    it("sunburst slices dom validation", (done: DoneFn) => {
+    it("ringChart slices dom validation", (done: DoneFn) => {
         dataView = defaultDataViewBuilder.getDataView(
             [
                 defaultDataViewBuilder.RegionsDataSet,
@@ -520,9 +520,9 @@ describe("Sunburst", () => {
         });
     });
 
-    describe("covertTreeNodeToSunBurstDataPoint", () => {
-        it("SunburstDataPoint name should not contain `undefined` value", () => {
-            const dataPoint: SunburstDataPoint = visualBuilder.instance.covertTreeNodeToSunBurstDataPoint(
+    describe("covertTreeNodeToRingChartDataPoint", () => {
+        it("RingChartDataPoint name should not contain `undefined` value", () => {
+            const dataPoint: RingChartDataPoint = visualBuilder.instance.covertTreeNodeToRingChartDataPoint(
                 {
                     name: undefined
                 },

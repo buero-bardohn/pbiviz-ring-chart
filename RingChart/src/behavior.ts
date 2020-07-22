@@ -41,7 +41,7 @@ import SelectableDataPoint = interactivitySelectionService.SelectableDataPoint;
 import IBehaviorOptions = interactivityBaseService.IBehaviorOptions;
 import InteractivitySelectionService = interactivitySelectionService.InteractivitySelectionService;
 
-import { SunburstDataPoint } from "./dataInterfaces";
+import { RingChartDataPoint } from "./dataInterfaces";
 
 const DimmedOpacity: number = 0.2;
 const DefaultOpacity: number = 1.0;
@@ -59,12 +59,12 @@ function getFillOpacity(
     return DefaultOpacity;
 }
 
-export interface BehaviorOptions extends IBehaviorOptions<SunburstDataPoint> {
-    // dataPoints: SunburstDataPoint[];
-    selection: Selection<d3.BaseType, HierarchyRectangularNode<SunburstDataPoint>, d3.BaseType, SunburstDataPoint>;
+export interface BehaviorOptions extends IBehaviorOptions<RingChartDataPoint> {
+    // dataPoints: RingChartDataPoint[];
+    selection: Selection<d3.BaseType, HierarchyRectangularNode<RingChartDataPoint>, d3.BaseType, RingChartDataPoint>;
     clearCatcher: Selection<d3.BaseType, any, d3.BaseType, any>;
     interactivityService: IInteractivityService<SelectableDataPoint>;
-    onSelect?: (dataPoint: SunburstDataPoint) => void;
+    onSelect?: (dataPoint: RingChartDataPoint) => void;
 }
 
 export class Behavior implements IInteractiveBehavior {
@@ -82,7 +82,7 @@ export class Behavior implements IInteractiveBehavior {
             onSelect
         } = options;
 
-        selection.on("click", (dataPoint: HierarchyRectangularNode<SunburstDataPoint>) => {
+        selection.on("click", (dataPoint: HierarchyRectangularNode<RingChartDataPoint>) => {
             const event: Event = getEvent() as Event;
 
             selectionHandler.handleSelection(dataPoint.data, false);
@@ -110,12 +110,12 @@ export class Behavior implements IInteractiveBehavior {
         } = this.options;
 
         this.options.dataPoints
-            .filter((dataPoint: SunburstDataPoint) => dataPoint && dataPoint.selected)
+            .filter((dataPoint: RingChartDataPoint) => dataPoint && dataPoint.selected)
             .forEach(this.markDataPointsAsSelected.bind(this));
 
         const hasHighlights: boolean = interactivityService.hasSelection();
 
-        selection.style("opacity", (dataPoint: HierarchyRectangularNode<SunburstDataPoint>) => {
+        selection.style("opacity", (dataPoint: HierarchyRectangularNode<RingChartDataPoint>) => {
             const { selected, highlight } = dataPoint.data;
             return getFillOpacity(
                 selected,
@@ -126,7 +126,7 @@ export class Behavior implements IInteractiveBehavior {
         });
     }
 
-    private markDataPointsAsSelected(root: SunburstDataPoint): void {
+    private markDataPointsAsSelected(root: RingChartDataPoint): void {
         if (!root || !root.parent) {
             return;
         }
@@ -138,17 +138,17 @@ export class Behavior implements IInteractiveBehavior {
 }
 
 export class InteractivityService extends InteractivitySelectionService {
-    constructor(host: IVisualHost, private onSelect?: (dataPoint: SunburstDataPoint) => void) {
+    constructor(host: IVisualHost, private onSelect?: (dataPoint: RingChartDataPoint) => void) {
         super(host);
     }
 
     /**
-     * Sunburst does not support multi selection because it's hard to render a center tooltip for more than a single data point
+     * RingChart does not support multi selection because it's hard to render a center tooltip for more than a single data point
      */
     public restoreSelection(selectionIds: ISelectionId[]): void {
         super.restoreSelection(selectionIds);
-        const selectedDataPoint: SunburstDataPoint = (this.selectableDataPoints as SunburstDataPoint[])
-            .filter((dataPoint: SunburstDataPoint) => {
+        const selectedDataPoint: RingChartDataPoint = (this.selectableDataPoints as RingChartDataPoint[])
+            .filter((dataPoint: RingChartDataPoint) => {
                 return dataPoint
                     && dataPoint.identity
                     && selectionIds

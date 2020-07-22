@@ -27,7 +27,7 @@
 import { dataViewObjectsParser } from "powerbi-visuals-utils-dataviewutils";
 import DataViewObjectsParser = dataViewObjectsParser.DataViewObjectsParser;
 
-class SunburstProportionFieldSettings {
+class RingChartProportionFieldSettings {
     public fontSizePercentage: number = 20;
     public fontSizeCategory: number = 20;
     public positionCategory: number = 10;
@@ -36,10 +36,10 @@ class SunburstProportionFieldSettings {
     public decimalPlaces: string = "2";
 }
 
-class SunburstGroupSettings {
+class RingChartGroupSettings {
 }
 
-class SunburstTooltipSettings {
+class RingChartTooltipSettings {
     public displayUnits: number = 0;
     public precision: number = 2;
 }
@@ -53,10 +53,10 @@ class LegendSettings {
     fontSize: number = 8;
 }
 
-export class SunburstSettings extends DataViewObjectsParser {
-    public group: SunburstGroupSettings = new SunburstGroupSettings();
-    public proportionField: SunburstProportionFieldSettings = new SunburstProportionFieldSettings();
+export class RingChartSettings extends DataViewObjectsParser {
+    public group: RingChartGroupSettings = new RingChartGroupSettings();
+    public proportionField: RingChartProportionFieldSettings = new RingChartProportionFieldSettings();
     public legend: LegendSettings = new LegendSettings();
-    public tooltip: SunburstTooltipSettings = new SunburstTooltipSettings();
+    public tooltip: RingChartTooltipSettings = new RingChartTooltipSettings();
 }
 

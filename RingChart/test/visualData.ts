@@ -316,7 +316,7 @@ export class VisualData extends TestDataViewBuilder {
     public readonly RegionsDataSet: string = "Regions";
     public readonly CountriesDataSet: string = "Countries";
     public readonly StatesDataSet: string = "States";
-    public readonly visualName: string = "Sunburst";
+    public readonly visualName: string = "RingChart";
     private readonly measure: DataViewMetadataColumn = {
         displayName: "Value",
         index: 3,

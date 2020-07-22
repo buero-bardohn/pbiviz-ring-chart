@@ -29,21 +29,21 @@ import { TooltipEnabledDataPoint } from "powerbi-visuals-utils-tooltiputils";
 import { interactivitySelectionService } from "powerbi-visuals-utils-interactivityutils";
 import SelectableDataPoint = interactivitySelectionService.SelectableDataPoint;
 
-export interface SunburstData {
-    root: SunburstDataPoint; // Tree data points
-    dataPoints: SunburstDataPoint[]; // Flat data points
+export interface RingChartData {
+    root: RingChartDataPoint; // Tree data points
+    dataPoints: RingChartDataPoint[]; // Flat data points
     total: number;
 }
 
-export interface SunburstDataPoint extends
+export interface RingChartDataPoint extends
     TooltipEnabledDataPoint,
     SelectableDataPoint {
-    children?: SunburstDataPoint[];
+    children?: RingChartDataPoint[];
     value?: number;
     color?: string;
     active?: boolean;
     name?: string;
-    parent?: SunburstDataPoint;
+    parent?: RingChartDataPoint;
     total: number;
     key: string;
     highlight?: boolean;
