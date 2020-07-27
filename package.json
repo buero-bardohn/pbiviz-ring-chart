@@ -3,8 +3,12 @@
   "description": "RingChart chart.",
   "version": "2.5.0",
   "author": {
-    "name": "Microsoft",
-    "email": "pbicvsupport@microsoft.com"
+    "name": "Buero Bardohn GmbH",
+    "email": "schmalz@buerobardohn.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/buero-bardohn/pbiviz-ring-chart.git"
   },
   "scripts": {
     "pbiviz": "pbiviz",
@@ -46,6 +50,7 @@
     "less": "3.9.0",
     "less-loader": "^4.1.0",
     "lodash-es": ">=4.17.14",
+    "postcss": "^7.0.32",
     "powerbi-models": "^1.0.8",
     "powerbi-visuals-api": "^2.5.0",
     "powerbi-visuals-tools": "^3.1.15",
@@ -69,8 +74,9 @@
     "webpack": "^4.41.4"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.2.5",
+    "@babel/polyfill": "^7.10.4",
     "ajv": "^6.10.2",
-    "core-js": "^3.3.6"
+    "core-js": "^3.3.6",
+    "nyc": "^15.1.0"
   }
 }
