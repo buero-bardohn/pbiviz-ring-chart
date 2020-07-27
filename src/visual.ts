@@ -270,7 +270,7 @@ export class RingChart implements IVisual {
             this.viewport = options.viewport;
 
             this.settings = this.parseSettings(options.dataViews[0]);
-            
+
             const formatter: IValueFormatter = valueFormatter.create({
                 value: this.settings.tooltip.displayUnits,
                 precision: this.settings.tooltip.precision,
@@ -316,11 +316,11 @@ export class RingChart implements IVisual {
                 this.behavior.renderSelection(false);
             }
             this.data.dataPoints.forEach((dataPoint: RingChartDataPoint) => {
-                if(dataPoint.active) {
+                if (dataPoint.active) {
                     let decimalPlaces = this.settings.proportionField.decimalPlaces;
                     let decimalFormat = `0.${"0".repeat(parseInt(decimalPlaces))}%;-0.${"0".repeat(parseInt(decimalPlaces))}%;0.${"0".repeat(parseInt(decimalPlaces))}%;`;
                     this.percentageFormatter = valueFormatter.create({ cultureSelector: this.visualHost.locale, format: decimalFormat });
-                    const percentage: string = this.getFormattedValue(dataPoint.total / this.data.total, this.percentageFormatter).replace(/\./g, ',');
+                    const percentage: string = this.getFormattedValue(dataPoint.total / this.data.total, this.percentageFormatter).replace(/\./g, ",");
                     this.percentageLabel.data([percentage]);
                     this.percentageLabel.style("fill", dataPoint.color);
                     this.selectedCategoryLabel.data([dataPoint ? dataPoint.tooltipInfo[0].displayName : ""]);
@@ -348,7 +348,7 @@ export class RingChart implements IVisual {
             const topCategories: RingChartDataPoint[] = this.data.root.children;
             this.enumerateColors(topCategories, instanceEnumeration);
         }
-        
+
         if (options.objectName === RingChart.SelectedDataPropertyIdentifier.objectName) {
             const topCategories: RingChartDataPoint[] = this.data.root.children;
             if (topCategories && topCategories.length > 0) {
@@ -474,7 +474,7 @@ export class RingChart implements IVisual {
     private partition(data: RingChartDataPoint) {
         const root = d3Hierarchy<RingChartDataPoint>(data)
             .sum(d => d.value);
-            //.sort((a, b) => b.value - a.value);
+            // .sort((a, b) => b.value - a.value);
         return d3Partition<RingChartDataPoint>()
             .size([2 * Math.PI, RingChart.OuterRadius * RingChart.OuterRadius])(root)
             .each(d => {
@@ -494,13 +494,13 @@ export class RingChart implements IVisual {
         this.toggleLabels(isSelected);
 
         if (!isSelected) {
-            
+
             this.data.dataPoints.forEach((dataPoint: RingChartDataPoint) => {
-                if(dataPoint.active) {
+                if (dataPoint.active) {
                     let decimalPlaces = this.settings.proportionField.decimalPlaces;
                     let decimalFormat = `0.${"0".repeat(parseInt(decimalPlaces))}%;-0.${"0".repeat(parseInt(decimalPlaces))}%;0.${"0".repeat(parseInt(decimalPlaces))}%;`;
                     this.percentageFormatter = valueFormatter.create({ cultureSelector: this.visualHost.locale, format: decimalFormat });
-                    const percentage: string = this.getFormattedValue(dataPoint.total / this.data.total, this.percentageFormatter).replace(/\./g, ',');
+                    const percentage: string = this.getFormattedValue(dataPoint.total / this.data.total, this.percentageFormatter).replace(/\./g, ",");
                     this.percentageLabel.data([percentage]);
                     this.percentageLabel.style("fill", dataPoint.color);
                     this.selectedCategoryLabel.data([dataPoint ? dataPoint.tooltipInfo[0].displayName : ""]);
@@ -512,7 +512,7 @@ export class RingChart implements IVisual {
             return;
         }
 
-        const percentage: string = this.getFormattedValue(dataPoint.total / this.data.total, this.percentageFormatter).replace(/\./g, ',');
+        const percentage: string = this.getFormattedValue(dataPoint.total / this.data.total, this.percentageFormatter).replace(/\./g, ",");
         this.percentageLabel.data([percentage]);
         this.percentageLabel.style("fill", dataPoint.color);
         this.selectedCategoryLabel.data([dataPoint ? dataPoint.tooltipInfo[0].displayName : ""]);
@@ -610,10 +610,10 @@ export class RingChart implements IVisual {
             : "";
 
         let activeValue: boolean = false;
-        if(typeof(originParentNode.objects) != 'undefined' && typeof(originParentNode.objects.proportionField) != 'undefined') {
+        if (typeof(originParentNode.objects) !== "undefined" && typeof(originParentNode.objects.proportionField) !== "undefined") {
             activeValue = !!originParentNode.objects.proportionField.selectedData;
         }
-        
+
         const newDataPointNode: RingChartDataPoint = {
             name,
             identity,
@@ -762,9 +762,9 @@ export class RingChart implements IVisual {
         if (this.settings.proportionField.showSelected) {
             if (this.selectedCategoryLabel) {
                 const labelSize: number = this.settings.proportionField.fontSizeCategory;
-        
+
                 this.selectedCategoryLabel
-                    .attr(CssConstants.transformProperty, translate(0, (+labelSize + (this.settings.proportionField.fontSizePercentage/2) + this.settings.proportionField.positionCategory)))
+                    .attr(CssConstants.transformProperty, translate(0, (+labelSize + (this.settings.proportionField.fontSizePercentage / 2) + this.settings.proportionField.positionCategory)))
                     .style("font-size", PixelConverter.toString(labelSize))
                     .text((x: string) => x).each(function (d: string) { self.wrapLabel(d3Select(this), RingChart.DefaultDataLabelPadding, width); });
             }
@@ -782,7 +782,7 @@ export class RingChart implements IVisual {
                 RingChart.MultilinePercentageLineInterval :
                 RingChart.DefaultPercentageLineInterval);
         this.percentageLabel
-            .attr(CssConstants.transformProperty, translate(0, (this.settings.proportionField.fontSizePercentage/2)))
+            .attr(CssConstants.transformProperty, translate(0, (this.settings.proportionField.fontSizePercentage / 2)))
             .style("font-size", PixelConverter.toString(labelSize))
             .text((x: string) => x);
     }
@@ -866,12 +866,10 @@ export class RingChart implements IVisual {
         const completedLines = [];
         let nextLine = "";
         let maxWidth = (width - 2 * padding);
-        
+
         words.forEach((word, index) => {
             const wordLength = this.getTextWidth(`${word} `, `500 ${selection.style("font-size")} sans-serif`);
             const nextLineLength = this.getTextWidth(nextLine, `500 ${selection.style("font-size")} sans-serif`);
-            console.log(wordLength)
-            console.log(maxWidth)
 
             if (wordLength > maxWidth) {
                 const { hyphenatedStrings, remainingWord } = this.breakString(selection, word, maxWidth);
@@ -895,20 +893,17 @@ export class RingChart implements IVisual {
               ${word}
             </tspan>`
           ));
-          
+
           labelText.forEach((tspanText, index) => {
-            selection.append('tspan')
+            selection.append("tspan")
                 .text(tspanText)
                 .attr("x", selection.attr("x"))
                 .attr("y", index === 0 ? selection.attr("y") : (+selection.attr("y") + index * parseInt(selection.style("font-size"), 10)));
           });
 
-
-          //selection.text(result);
-          //console.log(label.)
     }
 
-    private breakString(selection, word, maxWidth, hyphenCharacter='-') {
+    private breakString(selection, word, maxWidth, hyphenCharacter = "-") {
         const characters = word.split("");
         const lines = [];
         let currentLine = "";
