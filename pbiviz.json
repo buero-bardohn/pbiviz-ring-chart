@@ -5,13 +5,14 @@
     "guid": "RingChart1445472000809",
     "visualClassName": "RingChart",
     "version": "2.0.1",
-    "description": "RingChart is a multilevel donut chart, used to visualize hierarchical data, depicted by concentric circles.",
-    "supportUrl": "https://community.powerbi.com"
+    "description": "RingChart is a donut chart, used to visualize data.",
+    "supportUrl": "https://community.powerbi.com",
+    "gitHubUrl": "https://github.com/bb-schmalz/pbiviz-ring-chart/tree/certification"
   },
   "apiVersion": "2.5.0",
   "author": {
-    "name": "Microsoft",
-    "email": "pbicvsupport@microsoft.com"
+    "name": "Buero Bardohn GmbH",
+    "email": "mschmalz@buerobardohn.de"
   },
   "assets": {
     "icon": "assets/icon.png"
